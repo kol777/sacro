@@ -24,20 +24,26 @@ var client = new Twitter({
   access_token_secret: keys.twitter.access_token_secret
 });
 //console.log(keys.twitter.access_token_secret)
-client.post('statuses/update', {status: 'tweet'}, function(error, tweet, response) {
-  if (!error) {
-    console.log(tweet);
-  }
-});
+// client.post('statuses/update', {status: 'tweet'}, function(error, tweet, response) {
+//   if (!error) {
+//     console.log(tweet);
+//   }
+// });
 // Twitter Stream
-// var stream = twitterClient.stream('statuses/filter', {track: 'javascript'});
-// stream.on('data', function(event) {
-//   console.log(event && event.text);
-// });
-//
-// stream.on('error', function(error) {
-//   throw error;
-// });
+var stream = client.stream('statuses/filter', {track: 'Trump'});
+stream.on('data', function(event) {
+  console.log(event && event.text);
+  //console.log("User-ul care a postat: ", event.user.name)
+  //console.log("Evenimentul este: ", event.text);
+
+  // fs.appendFile('output.log', event.text, function(err){
+  //   console.log('File successfully written! - Check your project directory for the output.json file');
+  // })
+});
+
+stream.on('error', function(error) {
+  throw error;
+});
 
 // twitterClient.stream('statuses/filter', {track: 'twitter'},  function(stream) {
 //   stream.on('data', function(tweet) {
