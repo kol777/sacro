@@ -9,9 +9,51 @@ const request = require('request');
 const cheerio = require('cheerio');
 const app = express();
 
+// for twitter api credentials
+const keys = require('./config/keys');
 // set up ejs view
 app.set('view engine', 'ejs');
 
+
+var Twitter = require('twitter');
+// TWITTER
+var client = new Twitter({
+  consumer_key: keys.twitter.consumer_key,
+  consumer_secret: keys.twitter.consumer_secret,
+  access_token_key: keys.twitter.access_token_key,
+  access_token_secret: keys.twitter.access_token_secret
+});
+//console.log(keys.twitter.access_token_secret)
+client.post('statuses/update', {status: 'tweet'}, function(error, tweet, response) {
+  if (!error) {
+    console.log(tweet);
+  }
+});
+// Twitter Stream
+// var stream = twitterClient.stream('statuses/filter', {track: 'javascript'});
+// stream.on('data', function(event) {
+//   console.log(event && event.text);
+// });
+//
+// stream.on('error', function(error) {
+//   throw error;
+// });
+
+// twitterClient.stream('statuses/filter', {track: 'twitter'},  function(stream) {
+//   stream.on('data', function(tweet) {
+//     console.log(tweet.text);
+//   });
+//
+//   stream.on('error', function(error) {
+//     console.log(error);
+//   });
+// });
+//
+// twitterClient.get('favorites/list', function(error, tweets, response) {
+//   if(error) throw error;
+//   console.log(tweets);  // The favorites.
+//   console.log(response);  // Raw response object.
+// });
 
 // // connect to mongodb
 // mongoose.connect(keys.mongodb.dbURI, () =>{
