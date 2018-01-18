@@ -24,8 +24,11 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "ejs": "^2.5.7",
+    "elo-calculator": "^1.0.1",
     "express": "^4.16.2",
     "request": "^2.83.0",
-    "twitter": "^1.7.1"
+    "request-promise": "^4.2.2",
+    "twitter": "^1.7.1",
+    "underscore": "^1.8.3"
   }
 }

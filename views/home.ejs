@@ -3,40 +3,18 @@
     <head>
         <meta charset="utf-8">
         <title>Sacro</title>
-        <style>
-            body{
-                font-family: arial;
-                margin: 0;
-            }
-            nav{
-                background: #009933;
-                padding: 20px 10px;
-            }
-            nav ul{
-                max-width: 960px;
-                margin: 0 auto;
-                padding: 0;
-            }
-            nav li{
-                list-style-type: none;
-                display: inline-block;
-                margin: 0 10px 0 0;
-            }
-            nav a{
-                color: #fff;
-                font-size: 18px;
-                background: rgba(255,255,255,0.2);
-                text-decoration: none;
-                padding: 10px;
-                display: block;
-            }
-            main, header{
-                max-width: 960px;
-                margin: 30px auto;
-                padding: 0 10px;
-                color: #333;
-            }
-        </style>
+
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet"  type="text/css" href="site.css">
+
     </head>
     <body>
         <nav>
@@ -44,5 +22,147 @@
               <li><a href="/">Sacro</a></li>
             </ul>
         </nav>
+        <text>
+
+<div style="display:none">
+  <% for (var i = 0; i < egaluri.length; i++) { %>
+    <span id='<%= date[i][0]  %>-egal' ><%= egaluri[i]  %></span>
+  <% } %>
+  <% for (var i = 0; i < scoruri.length; i++) { %>
+    <span id='<%= date[i][0]  %>-goluri' ><%= scoruri[i]  %></span>
+  <% } %>
+</div>
+
+<div id="tabel-probs">
+<table class="table">
+    <thead>
+      <tr>
+        <th><select class="selectpicker select-team"  id="first-team-select">
+<% for (var i = 0; i < date.length; i++) { %>
+  <option> <%=  date[i][0] %></option>
+
+  <% } %>
+</select></th>
+        <th>vs</th>
+        <th><select class="selectpicker select-team"  id="second-team-select">
+<% for (var i = 0; i < date.length; i++) { %>
+  <option> <%=  date[i][0] %></option>
+
+  <% } %>
+</select></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>x</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td><span class="label label-default" id="label-win">-</span></td>
+        <td><span class="label label-default" id="label-draw">-</span></td>
+        <td><span class="label label-default" id="label-loss">-</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div id="tabel-echipe">
+       <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Team</th>
+      <th scope="col">Ranking points</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for (var i = 0; i < date.length; i++) { %>
+    <tr>
+      <th scope="row"><%= i + 1  %></th>
+      <td><%= date[i][0]  %></td>
+      <td id='<%= date[i][0]  %>' ><%= date[i][1]  %></td>
+    </tr>
+  <% } %>
+
+  </tbody>
+
+</table>
+</div>
+       </text>
     </body>
 </html>
+
+<script>
+
+
+function expectedA(eloA, eloB ) {
+  return 1.0/(1 + Math.pow(10, (eloB - eloA)/400.0))
+}
+
+function updateStat(){
+   var selected1 = $('#first-team-select option:selected').val();
+  // alert('#' + selected);
+   var equalProb = 0
+   var rank1 = parseInt($('#' + selected1).text());
+   var selected2 = $('#second-team-select option:selected').val();
+  // alert('#' + selected);
+   var rank2 = parseInt($('#' + selected2).text());
+   prob = expectedA(rank1, rank2);
+
+   var egal1 = parseFloat($('#' + selected1 + '-egal').text());
+   var gol1 = parseFloat($('#' + selected1 + '-goluri').text());
+   var egal2 = parseFloat($('#' + selected2 + '-egal').text());
+   var gol2 = parseFloat($('#' + selected2 + '-goluri').text());
+   // alert(egal1 + ' ' + gol1 + ' ' + egal2 + ' ' + gol2);
+   if(Math.abs(rank1 - rank2) >= 200)
+     equalProb = 10 + Math.random() * 2 - 1;
+   else {
+     var p1 = 20;
+     if(egal1 <= 4) 
+       p1 = 15;
+
+     else{
+       if(egal1 >= 7)
+        p1 = 33;
+     }
+
+     var p2 = 20;
+     if(egal2 <= 4)
+       p2 = 15;
+
+     else{
+       if(egal2 >= 7)
+        p2 = 33;
+     }
+     equalProb = (p1 + p2)/2.0;
+
+     gm1 = Math.abs(gol1 - 1.33);
+     gm2 = Math.abs(gol2 - 1.33);
+     deviation = Math.pow((gm1+gm2), 2)
+     if(equalProb < 20){
+       equalProb+=deviation;
+     }
+     else{
+       equalProb-=deviation;
+     }
+   }
+   rez = parseFloat(Math.round(prob * 100) / 100).toFixed(2) * 100;
+   //rez2 = parseFloat(Math.round((1 - rez) * 100) / 100).toFixed(2);
+   rez = rez/100.0 * (1 - equalProb/100.0)
+   rez = (parseFloat(Math.round(rez * 100) / 100) * 100);
+
+   equalProb = parseFloat(Math.round(equalProb) / 100).toFixed(2) * 100;
+   $('#label-win').text(rez + "%");
+   $('#label-loss').text((100 - rez - equalProb) + "%");
+   $('#label-draw').text(equalProb + "%");
+   //alert(equalProb)
+}
+
+
+//on change function i need to control selected value
+$('#first-team-select').on('change', updateStat);
+
+$('#second-team-select').on('change', updateStat);
+</script>
